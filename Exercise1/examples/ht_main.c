@@ -39,7 +39,7 @@ int main() {
   printf("Inserting Entries...\n");
   for (int id = 0; id < RECORDS_NUM; ++id) {
     record = randomRecord();
-    printf("Inserting Record with ID: %d\n", record.id);
+    // printf("Inserting Record with ID: %d\n", record.id);
     HT_InsertEntry(info, record);
   }
 
