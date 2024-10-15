@@ -5,7 +5,7 @@
 #include "bf.h"
 #include "hp_file.h"
 
-#define RECORDS_NUM 10000 // Αριθμός εγγραφών
+#define RECORDS_NUM 1000 // Αριθμός εγγραφών
 #define FILE_NAME "data.db" // Όνομα αρχείου
 
 // Μακροεντολή για τον έλεγχο σφαλμάτων

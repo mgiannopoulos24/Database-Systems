@@ -6,7 +6,7 @@
 #include "ht_table.h"
 #include "record.h"
 
-#define RECORDS_NUM 1000000 // Αριθμός εγγραφών
+#define RECORDS_NUM 1000 // Αριθμός εγγραφών
 #define FILE_NAME "data.db" // Όνομα αρχείου
 #define NUM_BUCKETS 50 // Αριθμός buckets
 
