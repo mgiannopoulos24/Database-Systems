@@ -90,7 +90,7 @@ int HT_InsertEntry(HT_info *header_info, Record record) {
     }
 
     int bucket_index = record.id % header_info->buckets;
-    printf("Calculated bucket_index = %d for record.id = %d\n", bucket_index, record.id);
+    // printf("Calculated bucket_index = %d for record.id = %d\n", bucket_index, record.id);
 
     BF_Block *block;
     BF_Block_Init(&block);
@@ -177,6 +177,8 @@ int HT_GetAllEntries(HT_info *header_info, int value) {
     int current_block_id = bucketEntry.blockId;
     BF_Block *dataBlock;
     BF_Block_Init(&dataBlock);
+    int blocks_read = 0;
+    int found = 0;
 
     while (current_block_id != -1) {
         CALL_BF(BF_GetBlock(header_info->fileDesc, current_block_id, dataBlock));
@@ -187,16 +189,23 @@ int HT_GetAllEntries(HT_info *header_info, int value) {
             if (records[i].id == value) {
                 printf("Record found: ID: %d, Name: %s, Surname: %s, City: %s\n",
                        records[i].id, records[i].name, records[i].surname, records[i].city);
+                found = 1;
             }
         }
 
         HT_block_info *block_info = (HT_block_info *)(blockData + BF_BLOCK_SIZE - sizeof(HT_block_info));
         current_block_id = block_info->nextBlock;
         CALL_BF(BF_UnpinBlock(dataBlock));
+        blocks_read++;
+    }
+
+    if (!found) {
+        printf("No record found with ID: %d\n", value);
     }
 
     CALL_BF(BF_UnpinBlock(block));
     BF_Block_Destroy(&block);
     BF_Block_Destroy(&dataBlock);
-    return HT_OK;
+    
+    return blocks_read;
 }
