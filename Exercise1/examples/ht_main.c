@@ -6,10 +6,11 @@
 #include "ht_table.h"
 #include "record.h"
 
-#define RECORDS_NUM 1000 // you can change it if you want
-#define FILE_NAME "data.db"
-#define NUM_BUCKETS 50 // Number of buckets for hash table
+#define RECORDS_NUM 1000000 // Αριθμός εγγραφών
+#define FILE_NAME "data.db" // Όνομα αρχείου
+#define NUM_BUCKETS 50 // Αριθμός buckets
 
+// Μακροεντολή για τον έλεγχο σφαλμάτων
 #define CALL_OR_DIE(call)     \
   {                           \
     BF_ErrorCode code = call; \
@@ -20,7 +21,7 @@
   }
 
 int main() {
-  BF_Init(LRU);
+  BF_Init(LRU); // Αρχικοποίηση Buffer Manager
 
   printf("Creating Hash Table file with %d buckets\n", NUM_BUCKETS);
   CALL_OR_DIE(HT_CreateFile(FILE_NAME, NUM_BUCKETS));
@@ -28,19 +29,19 @@ int main() {
   printf("Opening Hash Table file...\n");
   HT_info* info = HT_OpenFile(FILE_NAME);
   if (info == NULL) {
-      fprintf(stderr, "Failed to open hash table file.\n");
-      return 1;
+    fprintf(stderr, "Failed to open hash table file.\n");
+    return 1;
   }
 
   printf("Opened Hash Table file with %d buckets\n", info->buckets);
 
   Record record;
-  srand(time(NULL)); // Seeding the random number generator
+  srand(time(NULL)); // Seed για τυχαίες εγγραφές
+
   printf("Inserting Entries...\n");
   for (int id = 0; id < RECORDS_NUM; ++id) {
-    record = randomRecord();
-    // printf("Inserting Record with ID: %d\n", record.id);
-    HT_InsertEntry(info, record);
+    record = randomRecord(); // Δημιουργία τυχαίας εγγραφής
+    HT_InsertEntry(info, record); // Εισαγωγή εγγραφής
   }
 
   printf("Running PrintAllEntries...\n");
@@ -48,11 +49,8 @@ int main() {
   printf("Printing entries for ID: %d\n", id);
   HT_GetAllEntries(info, id);
 
-  printf("Closing Hash Table file...\n");
-  HT_CloseFile(info);
-
-  printf("Closing Buffer Manager...\n");
-  BF_Close();
+  HT_CloseFile(info); // Κλείσιμο αρχείου
+  BF_Close(); // Κλείσιμο Buffer Manager
 
   printf("Program completed successfully.\n");
 
