@@ -20,7 +20,7 @@ BF_MAIN=$(BUILDDIR)/bf_main
 HT_MAIN=$(BUILDDIR)/ht_main
 DBREAD=$(BUILDDIR)/db_check
 
-all: hp bf ht dbread
+all: hp bf ht dbcheck
 
 hp:
 	@echo "Compiling hp_main ..."
