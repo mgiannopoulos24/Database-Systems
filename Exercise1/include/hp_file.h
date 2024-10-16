@@ -1,8 +1,7 @@
 #ifndef HP_FILE_H
 #define HP_FILE_H
 
-#include "bf.h"
-#include "record.h"
+#include <record.h>
 
 #define HP_MAX_FILENAME_LENGTH 256  // Μέγιστο μήκος ονόματος αρχείου
 #define MAX_MATCHES 1000            // Μέγιστος αριθμός αποτελεσμάτων από αναζήτηση
