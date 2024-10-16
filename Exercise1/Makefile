@@ -24,7 +24,7 @@ all: hp bf ht dbread
 
 hp:
 	@echo "Compiling hp_main ..."
-	$(CC) $(CFLAGS) $(LDFLAGS) $(HP_MAIN_SRC) $(LIBS) -o $(HP_MAIN) $(OPTIMIZE) -fsanitize=leak 
+	$(CC) $(CFLAGS) $(LDFLAGS) $(HP_MAIN_SRC) $(LIBS) -o $(HP_MAIN) $(OPTIMIZE) -w 
 
 bf:
 	@echo "Compiling bf_main ..."
