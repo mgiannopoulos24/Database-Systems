@@ -22,23 +22,27 @@ DBREAD=$(BUILDDIR)/db_check
 
 all: hp bf ht dbcheck
 
-hp:
+$(BUILDDIR):
+	@mkdir -p $(BUILDDIR)
+
+hp: $(BUILDDIR)
 	@echo "Compiling hp_main ..."
 	$(CC) $(CFLAGS) $(LDFLAGS) $(HP_MAIN_SRC) $(LIBS) -o $(HP_MAIN) $(OPTIMIZE) -w 
 
-bf:
+bf: $(BUILDDIR)
 	@echo "Compiling bf_main ..."
 	$(CC) $(CFLAGS) $(LDFLAGS) $(BF_MAIN_SRC) $(LIBS) -o $(BF_MAIN) $(OPTIMIZE) -w
 
-ht:
+ht: $(BUILDDIR)
 	@echo "Compiling ht_main ..."
 	$(CC) $(CFLAGS) $(LDFLAGS) $(HT_MAIN_SRC) $(LIBS) -o $(HT_MAIN) $(OPTIMIZE) -w
 
-dbcheck:
+dbcheck: $(BUILDDIR)
 	@echo "Compiling db_read ..."
 	$(CC) $(CFLAGS) $(LDFLAGS) $(DBREAD_SRC) $(LIBS) -o $(DBREAD) $(OPTIMIZE) -w
 
 clean:
 	rm -f $(HP_MAIN) $(BF_MAIN) $(HT_MAIN) $(DBREAD) data.db block_example.db
+	@rm -rf $(BUILDDIR)
 
 .PHONY: all hp bf ht dbcheck clean
