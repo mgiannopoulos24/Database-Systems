@@ -66,28 +66,18 @@ HP_info* HP_OpenFile(char *fileName, int *file_desc) {
 
     char *block_data = BF_Block_GetData(block);
 
-    // Δέσμευση μνήμης για τη δομή HP_info
-    HP_info *hp_info = malloc(sizeof(HP_info));
-    if (hp_info == NULL) {
-        fprintf(stderr, "Error allocating memory for HP_info.\n");
-        CALL_BF(BF_UnpinBlock(block), NULL);
-        BF_Block_Destroy(&block);
-        BF_CloseFile(*file_desc);
-        return NULL;
-    }
+    // Χρησιμοποιούμε δείκτη στη θέση της δομής HP_info εντός του block
+    HP_info *hp_info = (HP_info *)block_data;
 
-    // Αντιγραφή μεταδεδομένων από το block στη δομή HP_info
-    memcpy(hp_info, block_data, sizeof(HP_info));
-    
     CALL_BF(BF_UnpinBlock(block), NULL);
     BF_Block_Destroy(&block);
 
+    // Επιστρέφουμε τον pointer που δείχνει στα δεδομένα εντός του block
     return hp_info;
 }
 
 // Κλείσιμο αρχείου σωρού
 int HP_CloseFile(int file_desc, HP_info *hp_info) {
-    free(hp_info); // Αποδέσμευση της δομής HP_info
     CALL_BF(BF_CloseFile(file_desc), HP_ERROR); // Κλείσιμο του αρχείου
     return HP_OK;
 }
