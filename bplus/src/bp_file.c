@@ -54,32 +54,32 @@ int BP_CreateFile(char *fileName) {
 // Άνοιγμα αρχείου B+ δέντρου και ανάκτηση μεταδεδομένων
 BPLUS_INFO* BP_OpenFile(char *fileName, int *file_desc) {
     if (BF_OpenFile(fileName, file_desc) != BF_OK) {
-        return NULL; // Σε περίπτωση αποτυχίας, επιστρέφει NULL
+        return NULL;
     }
 
     BF_Block *block;
     BF_Block_Init(&block);
     
     if (BF_GetBlock(*file_desc, 0, block) != BF_OK) {
+        BF_Block_Destroy(&block);
         BF_CloseFile(*file_desc);
-        return NULL; // Επιστροφή NULL αν αποτύχει το GetBlock
+        return NULL;
     }
     
     char *data = BF_Block_GetData(block);
-    BPLUS_INFO *info = malloc(sizeof(BPLUS_INFO)); // Χρήση malloc
+    BPLUS_INFO *info = malloc(sizeof(BPLUS_INFO));
     if (info == NULL) {
         BF_UnpinBlock(block);
         BF_Block_Destroy(&block);
         BF_CloseFile(*file_desc);
-        return NULL; // Επιστροφή NULL αν αποτύχει η κατανομή
+        return NULL;
     }
     memcpy(info, data, sizeof(BPLUS_INFO));
     
     BF_UnpinBlock(block);
     BF_Block_Destroy(&block);
-    return info; // Επιστροφή του δείκτη info
+    return info;
 }
-
 
 // Κλείσιμο αρχείου B+ δέντρου
 int BP_CloseFile(int file_desc, BPLUS_INFO* info) {
@@ -97,7 +97,7 @@ int BP_InsertEntry(int file_desc, BPLUS_INFO *bplus_info, Record record) {
     if (bplus_info->root == -1) {
         if (BF_AllocateBlock(file_desc, block) != BF_OK) {
             BF_Block_Destroy(&block);
-            return -1; // Επιστροφή -1 αν αποτύχει η κατανομή
+            return -1;
         }
         char *data = BF_Block_GetData(block);
         
@@ -120,7 +120,7 @@ int BP_InsertEntry(int file_desc, BPLUS_INFO *bplus_info, Record record) {
     while (true) {
         if (BF_GetBlock(file_desc, block_id, block) != BF_OK) {
             BF_Block_Destroy(&block);
-            return -1; // Επιστροφή -1 αν αποτύχει το GetBlock
+            return -1;
         }
         char *data = BF_Block_GetData(block);
         
@@ -145,8 +145,6 @@ int BP_InsertEntry(int file_desc, BPLUS_INFO *bplus_info, Record record) {
     return -1;
 }
 
-
-
 // Αναζήτηση εγγραφής σε B+ δέντρο
 int BP_GetEntry(int file_desc, BPLUS_INFO *bplus_info, int id, Record **result) {
     *result = NULL;
@@ -163,9 +161,9 @@ int BP_GetEntry(int file_desc, BPLUS_INFO *bplus_info, int id, Record **result) 
             *result = find_in_leaf(data_node, id);
             CALL_BF(BF_UnpinBlock(block));
             BF_Block_Destroy(&block);
-            return *result ? 0 : -1; // Επιτυχία ή αποτυχία
+            return *result ? 0 : -1;
         } else {
-            block_id = find_next_block((BPLUS_INDEX_NODE*)data, id); // Συνεχίζει στο επόμενο επίπεδο
+            block_id = find_next_block((BPLUS_INDEX_NODE*)data, id);
             CALL_BF(BF_UnpinBlock(block));
         }
     }
