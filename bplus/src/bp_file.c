@@ -153,20 +153,40 @@ int BP_GetEntry(int file_desc, BPLUS_INFO *bplus_info, int id, Record **result) 
     BF_Block_Init(&block);
 
     while (true) {
+        if (block_id == -1) {
+            BF_Block_Destroy(&block);
+            return -1;
+        }
+
         CALL_BF(BF_GetBlock(file_desc, block_id, block));
         char *data = BF_Block_GetData(block);
 
         BPLUS_DATA_NODE *data_node = (BPLUS_DATA_NODE*)data;
         if (data_node->is_leaf) {
-            *result = find_in_leaf(data_node, id);
-            CALL_BF(BF_UnpinBlock(block));
+            Record* found_record = find_in_leaf(data_node, id);
+            if (found_record != NULL) {
+                // Δημιουργία νέας εγγραφής και αντιγραφή των δεδομένων
+                *result = malloc(sizeof(Record));
+                if (*result == NULL) {
+                    BF_UnpinBlock(block);
+                    BF_Block_Destroy(&block);
+                    return -1;
+                }
+                memcpy(*result, found_record, sizeof(Record));
+                BF_UnpinBlock(block);
+                BF_Block_Destroy(&block);
+                return 0;
+            }
+            BF_UnpinBlock(block);
             BF_Block_Destroy(&block);
-            return *result ? 0 : -1;
+            return -1;
         } else {
-            block_id = find_next_block((BPLUS_INDEX_NODE*)data, id);
-            CALL_BF(BF_UnpinBlock(block));
+            BPLUS_INDEX_NODE *index_node = (BPLUS_INDEX_NODE*)data;
+            block_id = find_next_block(index_node, id);
+            BF_UnpinBlock(block);
         }
     }
+    
     BF_Block_Destroy(&block);
     return -1;
 }
