@@ -49,8 +49,6 @@ int BP_CreateFile(char *fileName) {
     return 0;
 }
 
-
-
 // Άνοιγμα αρχείου B+ δέντρου και ανάκτηση μεταδεδομένων
 BPLUS_INFO* BP_OpenFile(char *fileName, int *file_desc) {
     if (BF_OpenFile(fileName, file_desc) != BF_OK) {
