@@ -11,16 +11,15 @@
 // Εισάγει εγγραφή σε φύλλο κόμβο
 bool insert_into_leaf(BPLUS_DATA_NODE *leaf, Record record) {
     if (leaf->key_count >= MAX_KEYS) {
-        return false; // Ο κόμβος είναι γεμάτος
+        return false; // Node is full
     }
-    // Εισαγωγή της εγγραφής με ταξινόμηση κατά id
     int i;
     for (i = leaf->key_count - 1; i >= 0 && leaf->keys[i] > record.id; i--) {
         leaf->keys[i + 1] = leaf->keys[i];
-        leaf->records[i + 1] = leaf->records[i];
+        memcpy(&leaf->records[i + 1], &leaf->records[i], sizeof(Record));
     }
     leaf->keys[i + 1] = record.id;
-    leaf->records[i + 1] = record;
+    memcpy(&leaf->records[i + 1], &record, sizeof(Record));
     leaf->key_count++;
     return true;
 }
@@ -32,5 +31,14 @@ Record* find_in_leaf(BPLUS_DATA_NODE *leaf, int id) {
             return &leaf->records[i];
         }
     }
-    return NULL; // Δεν βρέθηκε
+    return NULL;
+}
+
+// Helper function to initialize a B+ data node
+void initialize_data_node(BPLUS_DATA_NODE *node) {
+    node->is_leaf = true;
+    node->key_count = 0;
+    node->next_block = -1; // No next block initially
+    memset(node->keys, 0, sizeof(node->keys));
+    memset(node->records, 0, sizeof(node->records));
 }
