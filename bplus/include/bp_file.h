@@ -1,14 +1,15 @@
 #ifndef BP_FILE_H
 #define BP_FILE_H
-#include "record.h"
+
+#include <record.h>
 #include <stdbool.h>
+#include "bp_datanode.h"
 
+#define bplus_ERROR -1
 
-
-// Δομή μεταδεδομένων B+ δέντρου
 typedef struct {
-    int root; // Δείκτης στη ρίζα του δέντρου
-    int height; // Ύψος του δέντρου
+    BPLUS_DATA_NODE *root;
+    int block_numbers;
 } BPLUS_INFO;
 
 
@@ -51,8 +52,5 @@ int BP_InsertEntry(int file_desc,BPLUS_INFO* bplus_info, Record record);
  * να υποδείξει επιτυχία. Αν δεν υπάρχει τέτοια εγγραφή, η συνάρτηση θέτει 
  * το `result` σε `nullptr` και επιστρέφει `-1` για να υποδείξει αποτυχία.**/
 int BP_GetEntry(int file_desc, BPLUS_INFO* header_info, int id, Record** result);
-
-
-
 
 #endif 

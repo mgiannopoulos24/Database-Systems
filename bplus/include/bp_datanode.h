@@ -1,27 +1,20 @@
 #ifndef BP_DATANODE_H
 #define BP_DATANODE_H
 
-#include "bf.h"
-#include "bp_file.h"
-#include "record.h"
-#include "bp_indexnode.h"
+#include <stdbool.h>
+#include <record.h>
+#include <bf.h>
+#include <bp_file.h>
+#include <bp_indexnode.h>
 
-// Define the structure for a data node in the B+ tree
-typedef struct {
-    bool is_leaf;
-    int key_count;
-    int keys[MAX_KEYS];
+#define MAX_KEYS 4
+
+typedef struct bplus_data_node {
     Record records[MAX_KEYS];
-    int next_block;
+    struct bplus_data_node *children[MAX_KEYS + 1];         // ο πίνακας με τα παιδιά που έχει
+    int n;                                                  // τρέχον αριθμός κλειδιών
+    bool leaf;
+    struct bplus_data_node *next;                           // δείκτης στο επόμενο leaf.
 } BPLUS_DATA_NODE;
 
-// Initialize a B+ data node
-void initialize_data_node(BPLUS_DATA_NODE *node);
-
-// Insert a record into a leaf node
-bool insert_into_leaf(BPLUS_DATA_NODE *leaf, Record record);
-
-// Find a record in a leaf node
-Record* find_in_leaf(BPLUS_DATA_NODE *leaf, int id);
-
-#endif
+#endif 

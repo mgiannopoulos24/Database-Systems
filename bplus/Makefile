@@ -1,8 +1,8 @@
-CC=gcc
-CFLAGS=-g3 -I./include 
-LDFLAGS=-L./lib -Wl,-rpath=./lib
-LIBS=-lbf
-OPTIMIZE=-O2
+CC = gcc
+CFLAGS = -g -I./include 
+LDFLAGS = -L./lib -Wl,-rpath=./lib
+LIBS = -lbf
+OPTIMIZE = -O2
 
 SRCDIR=./src
 INCDIR=./include
@@ -20,7 +20,8 @@ $(BUILDDIR):
 
 bp: $(BUILDDIR)
 	@echo "Compiling bplus_main ..."
-	$(CC) $(CFLAGS) $(LDFLAGS) $(BP_MAIN_SRC) $(LIBS) -o $(BP_MAIN) $(OPTIMIZE) -w
+	rm -f $(BP_MAIN) data.db
+	$(CC) $(CFLAGS) $(LDFLAGS) $(BP_MAIN_SRC) $(LIBS) -o $(BP_MAIN) $(OPTIMIZE)
 
 clean:
 	rm -f $(BP_MAIN) data.db
