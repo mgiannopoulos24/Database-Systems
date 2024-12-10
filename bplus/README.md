@@ -13,7 +13,30 @@
 - Μέσω **make** δημιουργούμε το εκτελέσιμο αρχείο **bplus_main** που βρίσκεται εντός του καταλόγου **build/**.
 - Εκτελούμε τρέχοντας: ./build/bplus_main
 - ενδεικτική εκτέλεση:
-```
+```console
+qwerty@qwerty-ubuntu:~/Desktop/Github/Database-Systems/bplus$ ./build/bplus_main 
+Duplicate id detected: 336
+Duplicate id detected: 379
+Duplicate id detected: 784
+Duplicate id detected: 528
+Duplicate id detected: 500
+Duplicate id detected: 292
+Duplicate id detected: 100
+Duplicate id detected: 231
+Duplicate id detected: 338
+Duplicate id detected: 857
+Duplicate id detected: 127
+Duplicate id detected: 179
+Duplicate id detected: 211
+Duplicate id detected: 379
+Duplicate id detected: 573
+Duplicate id detected: 159
+Searching for: 159
+(159,Sofia,Mavromatis,Ioannina)
+Searching for: 161
+(161,Dimitrios,Skondras,Piraeus)
+Searching for: 1000
+Cannot find an entry for id = 1000
 ```
 - Το αρχείο **data.db** διαγράφεται σε κάθε make
 
