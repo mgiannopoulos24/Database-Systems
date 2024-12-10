@@ -44,6 +44,12 @@ void insertEntries()
 		record = randomRecord();
 		BP_InsertEntry(file_desc, info, record);
 	}
+	record.id = 161;
+	strcpy(record.name, "Dimitrios");
+	strcpy(record.surname, "Skondras");
+	strcpy(record.city, "Piraeus");
+
+	BP_InsertEntry(file_desc, info, record);
 	BP_CloseFile(file_desc, info);
 	BF_Close();
 }
@@ -61,6 +67,7 @@ void findEntries()
 
 	int id = 159;
 	int id2 = 161;
+	int id3 = 1000;
 	printf("Searching for: %d\n", id);
 	if (BP_GetEntry(file_desc, info, id, &result) == -1) {
 		printf("Cannot find an entry for id = %d\n", id);
@@ -68,8 +75,16 @@ void findEntries()
 		if (result != NULL)
 			printRecord(*result);
 	}
+	printf("Searching for: %d\n", id2);
 	if (BP_GetEntry(file_desc, info, id2, &result) == -1) {
 		printf("Cannot find an entry for id = %d\n", id2);
+	} else {
+		if (result != NULL)
+			printRecord(*result);
+	}
+	printf("Searching for: %d\n", id3);
+	if (BP_GetEntry(file_desc, info, id3, &result) == -1) {
+		printf("Cannot find an entry for id = %d\n", id3);
 	} else {
 		if (result != NULL)
 			printRecord(*result);

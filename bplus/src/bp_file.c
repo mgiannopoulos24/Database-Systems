@@ -92,10 +92,7 @@ static int split_child(BPLUS_DATA_NODE *parent, int i, BPLUS_DATA_NODE *child)
     return 1;
 }
 
-// returns
-// 1 on success
-// 0 if the record.id exists
-static int insert_unfull(BPLUS_DATA_NODE *node, Record record)
+static void insert_unfull(BPLUS_DATA_NODE *node, Record record)
 {
     int i = node->n - 1;
 
@@ -105,59 +102,27 @@ static int insert_unfull(BPLUS_DATA_NODE *node, Record record)
             node->records[i + 1] = node->records[i];
             --i;
         }
-        if (i >= 0 && node->records[i].id == record.id)
-            return 0; // Duplicate found
 
         // Insert the record
         node->records[i + 1] = record;
         node->n++;
-        return 1;
-    }
-
-    // Non-leaf node: Find the child to descend into
-    while (i >= 0 && node->records[i].id > record.id)
-        --i;
-
-    ++i;
-    // Check for duplicates in the current node
-    if (i < node->n && node->records[i].id == record.id)
-        return 0; 
-
-    // Split child if full and adjust the insertion path
-    if (node->children[i]->n == MAX_KEYS) {
-        split_child(node, i, node->children[i]);
-        if (node->records[i].id < record.id)
-            ++i;
-    }
-
-    // Recurse into the appropriate child
-    return insert_unfull(node->children[i], record);
-}
-
-
-// returns
-// 1 on success
-// 0 if the record.id exists
-// -1 on error
-static int insert(BPLUS_INFO *info, Record record)
-{
-    BPLUS_DATA_NODE *root = info->root;
-    if (root->n == MAX_KEYS) {
-        BPLUS_DATA_NODE *new_node;
-        if ((new_node = create_node(false)) == NULL)
-            return -1;
-        
-        new_node->children[0] = root;
-        split_child(new_node, 0, root);
-        if (insert_unfull(new_node, record) == 0)
-            return 0;
-        info->root = new_node;
     } else {
-        if(insert_unfull(root, record) == 0)
-            return 0;
-    return 1;
+        while (i >= 0 && node->records[i].id > record.id)
+            --i;
+
+        ++i;
+
+        // Split child if full and adjust the insertion path
+        if (node->children[i]->n == MAX_KEYS) {
+            split_child(node, i, node->children[i]);
+            if (node->records[i].id < record.id)
+                ++i;
+        }
+        // Recurse into the appropriate child
+        insert_unfull(node->children[i], record);
     }
 }
+
 
 static Record search(BPLUS_DATA_NODE *node, int id)
 {
@@ -173,12 +138,36 @@ static Record search(BPLUS_DATA_NODE *node, int id)
 
     if (node->leaf)
         return rec;
-
-    // Check if the child pointer is valid before dereferencing
-    if (node->children[i] == NULL)
-        return rec; // This prevents segfault if the child pointer is invalid
     
     return search(node->children[i], id);
+}
+
+// returns
+// 1 on success
+// 0 if the record.id exists
+// -1 on error
+static int insert(BPLUS_INFO *info, Record record) 
+{
+    BPLUS_DATA_NODE *root = info->root;
+
+    // Perform a global search to ensure no duplicate ID
+    Record search_result = search(root, record.id);
+    if (search_result.id != -1)
+        return 0; // Duplicate detected
+    
+    if (root->n == MAX_KEYS) {
+        BPLUS_DATA_NODE *new_node;
+        if ((new_node = create_node(false)) == NULL)
+            return -1;
+
+        new_node->children[0] = root;
+        split_child(new_node, 0, root);
+        insert_unfull(new_node, record);
+        info->root = new_node;
+    } else {
+        insert_unfull(root, record);
+    }
+    return 1;
 }
 
 static void display(BPLUS_DATA_NODE *node)
@@ -282,11 +271,8 @@ BPLUS_INFO* BP_OpenFile(char *fileName, int *file_desc)
 
 int BP_CloseFile(int file_desc, BPLUS_INFO* info)
 {  
-    if (info != NULL) {
-        if (info->root != NULL)
-            destroy(info->root);
+    if (info != NULL)
         free(info);
-    }
 
     return BF_CloseFile(file_desc) == BF_OK ? 0 : -1;
 }
@@ -325,13 +311,12 @@ int BP_InsertEntry(int file_desc, BPLUS_INFO *bplus_info, Record record)
 
     // Copy the root node into the allocated block
     memcpy(BF_Block_GetData(block), bplus_info, sizeof(BPLUS_INFO));
-
     // Set block dirty and unpin it
     BF_Block_SetDirty(block);
     CALL_BF(BF_UnpinBlock(block));
     BF_Block_Destroy(&block);
 
-    return blocks_num; // Successfully inserted the first record
+    return blocks_num;
 }
 
 
