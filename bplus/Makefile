@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -g -I./include 
+CFLAGS = -g -I ./include
 LDFLAGS = -L./lib -Wl,-rpath=./lib
 LIBS = -lbf
 OPTIMIZE = -O2

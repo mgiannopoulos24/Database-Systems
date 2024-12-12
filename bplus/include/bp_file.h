@@ -7,7 +7,7 @@
 
 #define bplus_ERROR -1
 
-typedef struct {
+typedef struct bplus_info {
     BPLUS_DATA_NODE *root;
     int block_numbers;
 } BPLUS_INFO;
