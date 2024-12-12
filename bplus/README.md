@@ -29,3 +29,32 @@
 - Στο **bp_file.c** υλοποιούμε την διεπαφή που αναφέρει η άσκηση. Χρησιμοποιεί την διεπαφή του **bp_datanode.h** και την **bf.h**.
 
 # Ενδεικτική εκτέλεση:
+```console
+sdi2200161@linux14:~/Desktop/Database-Systems/bplus$ make && ./build/bplus_main
+Compiling bplus_main ...
+rm -f ./build/bplus_main data.db
+gcc -g -I ./include -L./lib -Wl,-rpath=./lib ./examples/bp_main.c ./src/record.c ./src/bp_file.c ./src/bp_datanode.c ./src/bp_indexnode.c -lbf -o ./build/bplus_main -O2
+Duplicate id detected: 336
+Duplicate id detected: 379
+Duplicate id detected: 784
+Duplicate id detected: 528
+Duplicate id detected: 500
+Duplicate id detected: 292
+Duplicate id detected: 100
+Duplicate id detected: 231
+Duplicate id detected: 338
+Duplicate id detected: 857
+Duplicate id detected: 127
+Duplicate id detected: 179
+Duplicate id detected: 211
+Duplicate id detected: 379
+Duplicate id detected: 573
+Duplicate id detected: 159
+Searching for: 159
+(159,Sofia,Mavromatis,Ioannina)
+Searching for: 161
+(161,Dimitrios,Skondras,Piraeus)
+Searching for: 1000
+Cannot find an entry for id = 1000
+```
+- Τα μηνύματα για τα διπλότυπα εκτυπώνονται στο stderr.
