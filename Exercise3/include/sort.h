@@ -14,4 +14,6 @@ void sort_FileInChunks(int file_desc, int numBlocksInChunk);
 /* Sorts records within a CHUNK in ascending order based on the name and surname of each person. */
 void sort_Chunk(CHUNK* chunk);
 
+void mergeSort(Record* arr, int left, int right);
+
 #endif 
