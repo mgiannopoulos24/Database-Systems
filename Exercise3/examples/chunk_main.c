@@ -11,10 +11,11 @@ int createAndPopulateHeapFile(char* filename);
 
 int main() {
     BF_Init(LRU);
-    int file_desc = createAndPopulateHeapFile(FILE_NAME);
-    CHUNK_Iterator iterator = CHUNK_CreateIterator(file_desc, 5);
-    CHUNK chunk = {file_desc, 1, 5, 5*MAX_RECORDS_PER_BLOCK, 5};
+    int file_desc = createAndPopulateHeapFile(FILE_NAME); // Δημιουργία και γέμισμα του αρχείου σωρού
+    CHUNK_Iterator iterator = CHUNK_CreateIterator(file_desc, 5); // Δημιουργία iterator για chunks μεγέθους 5 blocks
+    CHUNK chunk = {file_desc, 1, 5, 5*MAX_RECORDS_PER_BLOCK, 5}; // Αρχικοποίηση του πρώτου chunk
 
+    // Εκτύπωση των εγγραφών σε κάθε chunk
     CHUNK_Print(chunk);
     CHUNK_GetNext(&iterator,&chunk);
     CHUNK_Print(chunk);

@@ -20,13 +20,13 @@ int compareRecords(const void* a, const void* b) {
 }
 
 bool shouldSwap(Record* rec1, Record* rec2) {
-    if(compareRecords(rec1,rec2) < 0) return true;
+    if(compareRecords(rec1,rec2) < 0) return true; // Επιστροφή true αν η rec1 πρέπει να προηγείται της rec2
     return false;
 }
 
 void sort_FileInChunks(int file_desc, int numBlocksInChunk){
 
-    // Create a CHUNK_Iterator for efficient traversal of chunks
+    // Δημιουργία iterator για τα chunks
     CHUNK_Iterator iterator = CHUNK_CreateIterator(file_desc, numBlocksInChunk);
     CHUNK chunk;
 
@@ -35,16 +35,17 @@ void sort_FileInChunks(int file_desc, int numBlocksInChunk){
     chunk.from_BlockId = 1;
     chunk.to_BlockId = numBlocksInChunk;
     chunk.recordsInChunk = ((chunk.to_BlockId - chunk.from_BlockId) * MAX_RECORDS_PER_BLOCK) + HP_GetRecordCounter(file_desc, chunk.to_BlockId);
-    sort_Chunk(&chunk);
+    sort_Chunk(&chunk); // Ταξινόμηση του πρώτου chunk
     
     for(int i = 1; i <= chunk.to_BlockId; i++) {
         HP_Unpin(file_desc,i);
     }
-    // Iterate through chunks
+    
+    // Επανάληψη για τα υπόλοιπα chunks
     while (CHUNK_GetNext(&iterator, &chunk) == 0) {
         sort_Chunk(&chunk);
         for(int i = chunk.from_BlockId; i <= chunk.to_BlockId; i++) {
-            HP_Unpin(file_desc,i);
+            HP_Unpin(file_desc,i); // Απελευθέρωση των blocks από τον buffer
         }
     }
 
@@ -57,34 +58,34 @@ void sort_Chunk(CHUNK* chunk) {
         HP_GetRecord(chunk->file_desc, chunk->from_BlockId + i / MAX_RECORDS_PER_BLOCK, i % MAX_RECORDS_PER_BLOCK, &records[i]);
     }
 
-    // Apply Merge Sort to sort the records within the chunk
+    // Ταξινόμηση των εγγραφών με Merge Sort
     mergeSort(records, 0, chunk->recordsInChunk - 1);
 
-    // Write the sorted chunk back to the file
+    // Εγγραφή των ταξινομημένων εγγραφών πίσω στο αρχείο
     for (int i = 0; i < chunk->recordsInChunk; i++) {
         HP_UpdateRecord(chunk->file_desc, chunk->from_BlockId + i / MAX_RECORDS_PER_BLOCK, i % MAX_RECORDS_PER_BLOCK, records[i]);
     }
 
-    // Free memory
+    // Απελευθέρωση μνήμης
     free(records);
 }
 
 
-// Merge function for merging two sorted halves of an array
+// Συνάρτηση για τη συγχώνευση δύο ταξινομημένων υποπινάκων
 void mergeFunc(Record* arr, int left, int mid, int right) {
     int i, j, k;
     int n1 = mid - left + 1;
     int n2 = right - mid;
 
-    // Create temporary arrays
+    // Δημιουργία προσωρινών πινάκων
     Record* L = (Record*)malloc(n1 * sizeof(Record));
     Record* R = (Record*)malloc(n2 * sizeof(Record));
 
-    // Copy data to temporary arrays L[] and R[]
+    // Αντιγραφή δεδομένων στους προσωρινούς πίνακες
     memcpy(L, &arr[left], n1 * sizeof(Record));
     memcpy(R, &arr[mid + 1], n2 * sizeof(Record));
 
-    // Merge the two halves back into arr[]
+    // Συγχώνευση των δύο υποπινάκων πίσω στον arr[]
     i = 0;
     j = 0;
     k = left;
@@ -99,36 +100,36 @@ void mergeFunc(Record* arr, int left, int mid, int right) {
         k++;
     }
 
-    // Copy the remaining elements of L[], if there are any
+    // Αντιγραφή των υπόλοιπων στοιχείων του L[], αν υπάρχουν
     while (i < n1) {
         arr[k] = L[i];
         i++;
         k++;
     }
 
-    // Copy the remaining elements of R[], if there are any
+    // Αντιγραφή των υπόλοιπων στοιχείων του R[], αν υπάρχουν
     while (j < n2) {
         arr[k] = R[j];
         j++;
         k++;
     }
 
-    // Free temporary arrays
+    // Απελευθέρωση μνήμης
     free(L);
     free(R);
 }
 
-// Merge Sort implementation
+// Υλοποίηση του Merge Sort
 void mergeSort(Record* arr, int left, int right) {
     if (left < right) {
-        // Same as (left + right) / 2, but avoids overflow for large left and right
-        int mid = left + (right - left) / 2;
+        
+        int mid = left + (right - left) / 2; // Υπολογισμός του μέσου σημείου για αποφυγή υπερχείλισης
 
-        // Sort the first and second halves
+        // Ταξινόμηση του πρώτου και του δεύτερου μισού
         mergeSort(arr, left, mid);
         mergeSort(arr, mid + 1, right);
 
-        // Merge the sorted halves
+        // Συγχώνευση των ταξινομημένων μισών
         mergeFunc(arr, left, mid, right);
     }
 }
